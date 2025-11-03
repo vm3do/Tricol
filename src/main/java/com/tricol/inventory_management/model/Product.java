@@ -2,6 +2,7 @@ package com.tricol.inventory_management.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "products")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
@@ -26,19 +28,19 @@ public class Product {
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
 
     @Column(name = "unit_price", nullable = false, precision = 19, scale = 2)
     private BigDecimal unitPrice;
 
-    @Column(name = "category", length = 100)
+    @Column(name = "category", length = 100, nullable = false)
     private String category;
 
-    @Column(name = "reorder_point") //critical point to order more
+    @Column(name = "reorder_point", nullable = false) //critical point to order more
     private Integer reorderPoint;
 
-    @Column(name = "unit", length = 50)
+    @Column(name = "unit", length = 50,  nullable = false)
     private String unit;
 
     @CreationTimestamp
