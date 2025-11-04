@@ -10,6 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -29,6 +33,21 @@ public class ProductService {
         Product saveProduct = productRepository.save(product);
         // convert saved entity to dto and return it as a response
         return productMapper.toDTO(saveProduct);
+    }
+
+    @Transactional(readOnly = true)
+    public ProductResponseDTO findById(Long id){
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product with id" + id + " does not exist"));
+        return productMapper.toDTO(product);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductResponseDTO> findAllProducts(){
+        List<Product> products = productRepository.findAll()
+                .stream()
+                .map(productMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
 
