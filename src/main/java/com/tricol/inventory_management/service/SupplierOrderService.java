@@ -100,7 +100,7 @@ public class SupplierOrderService {
 
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<SupplierOrderResponseDTO> getOrdersByDateRange(LocalDate start, LocalDate end) {
-        return supplierOrderRepository.findByDateBetween(start, end)
+        return supplierOrderRepository.findByOrderDateBetween(start, end)
                 .stream()
                 .map(supplierOrderMapper::toDTO)
                 .toList();
