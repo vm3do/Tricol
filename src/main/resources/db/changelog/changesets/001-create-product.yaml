@@ -4,7 +4,7 @@ databaseChangeLog:
       author: mohamed
       changes:
         - createTable:
-            tableName: products
+            tableName: product
             columns:
               - column:
                   name: id
@@ -27,8 +27,6 @@ databaseChangeLog:
               - column:
                   name: description
                   type: TEXT
-                  constraints:
-                    nullable: false
               - column:
                   name: unit_price
                   type: DECIMAL(19,2)
@@ -37,19 +35,13 @@ databaseChangeLog:
               - column:
                   name: category
                   type: VARCHAR(100)
-                  constraints:
-                    nullable: false
               - column:
                   name: reorder_point
                   type: INT
                   defaultValueNumeric: 0
-                  constraints:
-                    nullable: false
               - column:
                   name: unit
                   type: VARCHAR(50)
-                  constraints:
-                    nullable: false
               - column:
                   name: created_at
                   type: TIMESTAMP
@@ -58,6 +50,3 @@ databaseChangeLog:
                   name: updated_at
                   type: TIMESTAMP
                   defaultValueComputed: CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      rollback:
-        - dropTable:
-            tableName: products
