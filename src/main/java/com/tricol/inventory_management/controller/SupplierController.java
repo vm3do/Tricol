@@ -26,12 +26,12 @@ public class SupplierController {
         return ResponseEntity.ok(supplierService.findAllSuppliers());
     }
 
-    @GetMapping("/{ice}")
+    @GetMapping("/ice/{ice}")
     public ResponseEntity<SupplierResponseDTO> getSupplierByIce(@PathVariable String ice){
         return ResponseEntity.ok(supplierService.findByIce(ice));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<SupplierResponseDTO> getSupplierById(@PathVariable Long id){
         return ResponseEntity.ok(supplierService.findById(id));
     }

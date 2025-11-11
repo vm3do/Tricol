@@ -68,6 +68,7 @@
             <artifactId>mapstruct</artifactId>
             <version>1.6.3</version>
         </dependency>
+
 	</dependencies>
 
 	<build>
@@ -91,9 +92,9 @@
                 <configuration>
                     <changeLogFile>db/changelog-master.yaml</changeLogFile>
                     <driver>com.mysql.cj.jdbc.Driver</driver>
-                    <url>jdbc:mysql://localhost:3306/inventory_db?createDatabaseIfNotExist=true&amp;useSSL=false&amp;serverTimezone=UTC</url>
-                    <username>root</username>
-                    <password>NewPass123!</password>
+                    <url>${DB_URL}</url>
+                    <username>${DB_USERNAME}</username>
+                    <password>${DB_PASS}</password>
                 </configuration>
                 <dependencies>
                     <dependency>

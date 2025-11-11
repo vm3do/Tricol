@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +34,7 @@ public class ProductService {
         Product product = productMapper.toEntity(requestDTO);
         try {
             Product savedProduct = productRepository.save(product);
+            return productMapper.toDTO(savedProduct);
         } catch (DataIntegrityViolationException e) {
             // translate DB unique constraint violation (race condition) to domain exception
             throw new DuplicateResourceException("Product with reference " + requestDTO.getReference() + " already exists", e);
