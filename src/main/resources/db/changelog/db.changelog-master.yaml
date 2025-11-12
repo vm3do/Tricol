@@ -3,3 +3,4 @@ databaseChangeLog:
   - include: { file: 'db/changelog/changesets/002-create-supplier.yaml' }
   - include: { file: 'db/changelog/2025/11/09-01-changelog.yaml' }
   - include: { file: 'db/changelog/2025/11/09-02-changelog.yaml' }
+  - include: { file: 'db/changelog/changesets/003-add-total-amount-to-supplier-order-item.yaml' }

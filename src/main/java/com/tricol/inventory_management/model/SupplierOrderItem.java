@@ -32,4 +32,15 @@ public class SupplierOrderItem {
 
     @Column(name = "unit_price", nullable = false)
     private BigDecimal unitPrice;
+
+    @Column(name = "total_amount", nullable = false)
+    private BigDecimal totalAmount;
+
+    public void calculateTotalAmount() {
+        if (unitPrice != null && quantity > 0) {
+            this.totalAmount = unitPrice.multiply(BigDecimal.valueOf(quantity));
+        } else {
+            this.totalAmount = BigDecimal.ZERO;
+        }
+    }
 }
