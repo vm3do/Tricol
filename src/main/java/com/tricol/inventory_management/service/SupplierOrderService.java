@@ -31,49 +31,6 @@ public class SupplierOrderService {
     private final ProductRepository productRepository;
     private final SupplierOrderMapper supplierOrderMapper;
 
-//    public SupplierOrderResponseDTO createOrder(SupplierOrderRequestDTO requestDTO) {
-//        // fetch supplier
-//        Supplier supplier = supplierRepository.findById(requestDTO.getSupplierId())
-//                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found"));
-//
-//        // map DTO items to entities
-//        List<SupplierOrderItem> items = requestDTO.getItems().stream()
-//                .map(itemDTO -> {
-//                    Product product = productRepository.findById(itemDTO.getProductId())
-//                            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + itemDTO.getProductId()));
-//
-//                    SupplierOrderItem item = SupplierOrderItem.builder()
-//                            .product(product)
-//                            .quantity(itemDTO.getQuantity())
-//                            .unitPrice(itemDTO.getUnitPrice())
-//                            .build();
-//                    return item;
-//                })
-//                .toList();
-//
-//        // calculate total amount
-//        BigDecimal totalAmount = items.stream()
-//                .map(i -> i.getUnitPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        // create order
-//        SupplierOrder order = SupplierOrder.builder()
-//                .supplier(supplier)
-//                .items(items)
-//                .orderDate(requestDTO.getOrderDate())
-//                .status("PENDING") // or your default status
-//                .totalAmount(totalAmount)
-//                .build();
-//
-//        // link items back to order
-//        items.forEach(i -> i.setSupplierOrder(order));
-//
-//        // save order (cascade saves items)
-//        SupplierOrder savedOrder = supplierOrderRepository.save(order);
-//
-//        return supplierOrderMapper.toDTO(savedOrder); // map to response DTO
-//    }
-
     public SupplierOrderResponseDTO createOrder(SupplierOrderRequestDTO createDTO) {
 
         Supplier supplier = supplierRepository
