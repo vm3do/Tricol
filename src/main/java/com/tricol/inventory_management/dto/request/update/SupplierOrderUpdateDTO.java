@@ -1,5 +1,6 @@
 package com.tricol.inventory_management.dto.request.update;
 
+import com.tricol.inventory_management.dto.request.create.SupplierOrderItemRequestDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -13,12 +14,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SupplierOrderUpdateDTO {
-    @NotNull(message = "Order date is required")
+//    @NotNull(message = "Order date is required")
     private LocalDate orderDate;
 
-    @NotBlank(message = "Status is required")
+//    @NotBlank(message = "Status is required")
     private String status;
 
-    @NotEmpty(message = "Order must contain at least one item")
-    private List<@Valid SupplierOrderItemUpdateDTO> items;
+//    @NotEmpty(message = "Order must contain at least one item")
+    private List<@Valid SupplierOrderItemRequestDTO> items;
 }

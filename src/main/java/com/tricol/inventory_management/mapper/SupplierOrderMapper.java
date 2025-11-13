@@ -10,7 +10,7 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface SupplierOrderMapper {
-//    @Mapping(source = "itemsList", target = "items")
+//    @Mapping(source = "items", target = "items")
     SupplierOrderResponseDTO toDTO(SupplierOrder order);
     SupplierOrder toEntity(SupplierOrderRequestDTO dto);
 

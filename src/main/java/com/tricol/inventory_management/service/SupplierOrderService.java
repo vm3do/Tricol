@@ -2,6 +2,7 @@ package com.tricol.inventory_management.service;
 
 import com.tricol.inventory_management.dto.request.create.SupplierOrderItemRequestDTO;
 import com.tricol.inventory_management.dto.request.create.SupplierOrderRequestDTO;
+import com.tricol.inventory_management.dto.request.update.SupplierOrderItemUpdateDTO;
 import com.tricol.inventory_management.dto.request.update.SupplierOrderUpdateDTO;
 import com.tricol.inventory_management.dto.response.SupplierOrderResponseDTO;
 import com.tricol.inventory_management.enums.OrderStatus;
@@ -55,8 +56,7 @@ public class SupplierOrderService {
                     .unitPrice(itemDTO.getUnitPrice())
                     .build();
 
-            // Calculate total for each item if you want
-            item.calculateTotalAmount(); // only if you’ve implemented such a method
+            item.calculateTotalAmount();
             order.addItem(item);
         }
 
@@ -88,15 +88,54 @@ public class SupplierOrderService {
     }
 
 
-    public SupplierOrderResponseDTO updateOrder(Long id, SupplierOrderUpdateDTO dto) {
-        SupplierOrder existing = supplierOrderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " does not exist"));
+//    public SupplierOrderResponseDTO updateOrder(Long id, SupplierOrderUpdateDTO dto) {
+//        SupplierOrder existing = supplierOrderRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " does not exist"));
+//
+//        supplierOrderMapper.updateEntity(dto, existing);
+//
+//        SupplierOrder saved = supplierOrderRepository.save(existing);
+//        return supplierOrderMapper.toDTO(saved);
+//    }
+public SupplierOrderResponseDTO updateOrder(Long id, SupplierOrderUpdateDTO dto) {
+    SupplierOrder existing = supplierOrderRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " does not exist"));
 
-        supplierOrderMapper.updateEntity(dto, existing);
-
-        SupplierOrder saved = supplierOrderRepository.save(existing);
-        return supplierOrderMapper.toDTO(saved);
+    // Update basic fields only if provided (non-null)
+    if (dto.getOrderDate() != null) {
+        existing.setOrderDate(dto.getOrderDate());
     }
+
+    if (dto.getStatus() != null) {
+        existing.setStatus(OrderStatus.valueOf(dto.getStatus().toUpperCase()));
+    }
+
+    // Update items if provided
+    if (dto.getItems() != null && !dto.getItems().isEmpty()) {
+        // Clear existing items and add updated ones
+        existing.getItems().clear();
+
+        for (SupplierOrderItemRequestDTO itemDTO : dto.getItems()) {
+            Product product = productRepository.findById(itemDTO.getProductId()).orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + itemDTO.getProductId()));
+            SupplierOrderItem item = SupplierOrderItem
+                    .builder()
+                    .supplierOrder(existing)
+                    .unitPrice(itemDTO.getUnitPrice())
+                    .quantity(itemDTO.getQuantity())
+                    .product(product)
+                    .build();
+            item.calculateTotalAmount();
+            existing.addItem(item);
+        }
+
+        // Recalculate total amount after items update
+        existing.calculateTotalAmount();
+    }
+
+    SupplierOrder saved = supplierOrderRepository.save(existing);
+    return supplierOrderMapper.toDTO(saved);
+}
+
 
 
     public void deleteOrder(Long id) {
