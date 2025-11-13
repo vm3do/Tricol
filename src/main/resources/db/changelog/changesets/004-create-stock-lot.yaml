@@ -1,0 +1,95 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-stock-lot
+      author: medoa
+      changes:
+        - createTable:
+            tableName: stock_lot
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: lot_number
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: product_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: supplier_order_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: initial_quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: remaining_quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: unit_price
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entry_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: stock_lot
+            baseColumnNames: product_id
+            constraintName: fk_stock_lot_product
+            referencedTableName: product
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: stock_lot
+            baseColumnNames: supplier_order_id
+            constraintName: fk_stock_lot_supplier_order
+            referencedTableName: supplier_order
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            indexName: idx_stock_lot_product
+            tableName: stock_lot
+            columns:
+              - column:
+                  name: product_id
+
+        - createIndex:
+            indexName: idx_stock_lot_entry_date
+            tableName: stock_lot
+            columns:
+              - column:
+                  name: entry_date
+
+        - createIndex:
+            indexName: idx_stock_lot_remaining_qty
+            tableName: stock_lot
+            columns:
+              - column:
+                  name: remaining_quantity
+

@@ -31,6 +31,7 @@ public class SupplierOrderService {
     private final SupplierOrderRepository supplierOrderRepository;
     private final ProductRepository productRepository;
     private final SupplierOrderMapper supplierOrderMapper;
+    private final StockService stockService;
 
 
     public SupplierOrderResponseDTO createOrder(SupplierOrderRequestDTO createDTO) {
@@ -148,6 +149,20 @@ public SupplierOrderResponseDTO updateOrder(Long id, SupplierOrderUpdateDTO dto)
     }
 
 
+    public SupplierOrderResponseDTO validateOrder(Long id) {
+        SupplierOrder order = supplierOrderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " does not exist"));
+
+        if (!OrderStatus.PENDING.equals(order.getStatus())) {
+            throw new IllegalStateException("Only pending orders can be validated");
+        }
+
+        order.setStatus(OrderStatus.VALIDATED);
+        SupplierOrder saved = supplierOrderRepository.save(order);
+        return supplierOrderMapper.toDTO(saved);
+    }
+
+
     public SupplierOrderResponseDTO receiveOrder(Long id) {
         SupplierOrder order = supplierOrderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order with id " + id + " does not exist"));
@@ -156,9 +171,14 @@ public SupplierOrderResponseDTO updateOrder(Long id, SupplierOrderUpdateDTO dto)
             throw new IllegalStateException("Order already received");
         }
 
+        if (!OrderStatus.VALIDATED.equals(order.getStatus())) {
+            throw new IllegalStateException("Order is not validated");
+        }
+
         order.setStatus(OrderStatus.DELIVERED);
 
-        // TODO: integrate stock creation / FIFO logic here
+        // Process stock entry with FIFO logic
+        stockService.processStockEntry(order);
 
         SupplierOrder saved = supplierOrderRepository.save(order);
         return supplierOrderMapper.toDTO(saved);

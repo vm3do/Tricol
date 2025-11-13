@@ -41,7 +41,12 @@ public class SupplierOrderController {
         return ResponseEntity.ok(supplierOrderService.updateOrder(id, request));
     }
 
-    @PutMapping("/{id}/reception")
+    @PutMapping("/{id}/validate")
+    public ResponseEntity<SupplierOrderResponseDTO> validateOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(supplierOrderService.validateOrder(id));
+    }
+
+    @PutMapping("/{id}/receive")
     public ResponseEntity<SupplierOrderResponseDTO> receiveOrder(@PathVariable Long id) {
         return ResponseEntity.ok(supplierOrderService.receiveOrder(id));
     }
