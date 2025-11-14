@@ -49,6 +49,12 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public Product findEntityById(Long id){
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with id " + id + " does not exist"));
+    }
+
+    @Transactional(readOnly = true)
     public List<ProductResponseDTO> findAllProducts(){
         // as always, find all gives us a response, so  we go from entity to dto
         return productRepository.findAll()

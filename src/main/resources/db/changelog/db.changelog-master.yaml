@@ -6,4 +6,5 @@ databaseChangeLog:
   - include: { file: 'db/changelog/changesets/003-add-total-amount-to-supplier-order-item.yaml' }
   - include: { file: 'db/changelog/changesets/004-create-stock-lot.yaml' }
   - include: { file: 'db/changelog/changesets/005-create-stock-movement.yaml' }
+  - include: { file: 'db/changelog/changesets/006-add-reorder-point-to-product.yaml' }
 

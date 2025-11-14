@@ -3,21 +3,26 @@ package com.tricol.inventory_management.controller;
 import com.tricol.inventory_management.dto.request.create.ProductCreateRequestDTO;
 import com.tricol.inventory_management.dto.request.update.ProductUpdateRequestDTO;
 import com.tricol.inventory_management.dto.response.ProductResponseDTO;
+import com.tricol.inventory_management.dto.response.StockResponseDTO;
+import com.tricol.inventory_management.mapper.StockMapper;
+import com.tricol.inventory_management.model.Product;
 import com.tricol.inventory_management.service.ProductService;
+import com.tricol.inventory_management.service.StockService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
+@RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
-
-    public ProductController(ProductService productService){
-        this.productService = productService;
-    }
+    private final StockService stockService;
+    private final StockMapper stockMapper;
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
@@ -47,4 +52,15 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(id, request));
     }
 
+    @GetMapping("/{id}/stock")
+    public ResponseEntity<StockResponseDTO> getProductStock(@PathVariable Long id) {
+        Product product = productService.findEntityById(id);
+        Integer currentStock = stockService.getCurrentStock(id);
+        BigDecimal stockValue = stockService.getStockValuation(id);
+        Boolean isLowStock = product.getReorderPoint() != null && 
+                           currentStock <= product.getReorderPoint();
+
+        StockResponseDTO response = stockMapper.toStockDTO(product, currentStock, stockValue, isLowStock);
+        return ResponseEntity.ok(response);
+    }
 }

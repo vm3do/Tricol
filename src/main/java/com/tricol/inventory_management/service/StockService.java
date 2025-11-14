@@ -1,7 +1,9 @@
 package com.tricol.inventory_management.service;
 
 import com.tricol.inventory_management.enums.MovementType;
+import com.tricol.inventory_management.exception.ResourceNotFoundException;
 import com.tricol.inventory_management.model.*;
+import com.tricol.inventory_management.repository.ProductRepository;
 import com.tricol.inventory_management.repository.StockLotRepository;
 import com.tricol.inventory_management.repository.StockMovementRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,9 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +26,7 @@ public class StockService {
 
     private final StockLotRepository stockLotRepository;
     private final StockMovementRepository stockMovementRepository;
+    private final ProductRepository productRepository;
 
 
     public void processStockEntry(SupplierOrder supplierOrder) {
@@ -80,6 +86,105 @@ public class StockService {
 
     public List<StockMovement> getAllMovements() {
         return stockMovementRepository.findAllByOrderByMovementDateDesc();
+    }
+
+    public void processStockOutbound(Product product, Integer quantity, String reference, String notes) {
+        log.info("Processing FIFO stock outbound for product: {} with quantity: {}", product.getReference(), quantity);
+        
+        List<StockLot> availableLots = stockLotRepository.findAvailableLotsByProductOrderByEntryDate(product.getId());
+        
+        int remainingQuantity = quantity;
+        for (StockLot lot : availableLots) {
+            if (remainingQuantity <= 0) break;
+            
+            int quantityToTake = Math.min(remainingQuantity, lot.getRemainingQuantity());
+            
+            lot.setRemainingQuantity(lot.getRemainingQuantity() - quantityToTake);
+            stockLotRepository.save(lot);
+            
+            StockMovement movement = StockMovement.builder()
+                    .product(product)
+                    .stockLot(lot)
+                    .movementType(MovementType.SORTIE)
+                    .quantity(quantityToTake)
+                    .unitPrice(lot.getUnitPrice())
+                    .reference(reference)
+                    .notes(notes + " - Lot: " + lot.getLotNumber())
+                    .build();
+            
+            stockMovementRepository.save(movement);
+            remainingQuantity -= quantityToTake;
+        }
+        
+        if (remainingQuantity > 0) {
+            throw new IllegalStateException("Insufficient stock for product: " + product.getReference());
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Integer getCurrentStock(Long productId) {
+        List<StockLot> lots = stockLotRepository.findAvailableLotsByProductOrderByEntryDate(productId);
+        return lots.stream().mapToInt(StockLot::getRemainingQuantity).sum();
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal getStockValuation(Long productId) {
+        List<StockLot> lots = stockLotRepository.findAvailableLotsByProductOrderByEntryDate(productId);
+        return lots.stream()
+                .map(lot -> lot.getUnitPrice().multiply(BigDecimal.valueOf(lot.getRemainingQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Transactional(readOnly = true)
+    public BigDecimal getTotalStockValuation() {
+        List<StockLot> allLots = stockLotRepository.findAll();
+        return allLots.stream()
+                .filter(lot -> lot.getRemainingQuantity() > 0)
+                .map(lot -> lot.getUnitPrice().multiply(BigDecimal.valueOf(lot.getRemainingQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> getStockAlerts() {
+        return productRepository.findAll().stream()
+                .filter(product -> {
+                    if (product.getReorderPoint() == null) return false;
+                    Integer currentStock = getCurrentStock(product.getId());
+                    return currentStock <= product.getReorderPoint();
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<StockMovement> getMovementsByProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
+        return stockMovementRepository.findByProductOrderByMovementDateDesc(product);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getStockSummary() {
+        List<Product> allProducts = productRepository.findAll();
+        
+        Map<Long, Integer> stockLevels = allProducts.stream()
+                .collect(Collectors.toMap(
+                        Product::getId,
+                        product -> getCurrentStock(product.getId())
+                ));
+        
+        Map<Long, BigDecimal> stockValues = allProducts.stream()
+                .collect(Collectors.toMap(
+                        Product::getId,
+                        product -> getStockValuation(product.getId())
+                ));
+        
+        return Map.of(
+                "products", allProducts,
+                "stockLevels", stockLevels,
+                "stockValues", stockValues,
+                "totalValue", getTotalStockValuation(),
+                "alerts", getStockAlerts()
+        );
     }
 }
 

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/supplier-orders")
+@RequestMapping("/api/v1/orders")
 public class SupplierOrderController {
 
     private final SupplierOrderService supplierOrderService;
@@ -57,4 +57,8 @@ public class SupplierOrderController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/supplier/{supplierId}")
+    public ResponseEntity<List<SupplierOrderResponseDTO>> getOrdersBySupplier(@PathVariable Long supplierId) {
+        return ResponseEntity.ok(supplierOrderService.getOrdersBySupplier(supplierId));
+    }
 }

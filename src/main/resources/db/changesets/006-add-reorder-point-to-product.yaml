@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-add-reorder-point-to-product
+      author: system
+      changes:
+        - addColumn:
+            tableName: product
+            columns:
+              - column:
+                  name: reorder_point
+                  type: INTEGER
+                  constraints:
+                    nullable: true
+      rollback:
+        - dropColumn:
+            tableName: product
+            columnName: reorder_point

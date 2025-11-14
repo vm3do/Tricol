@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/suppliers")
+@RequestMapping("/api/v1/suppliers")
 public class SupplierController {
 
     private final SupplierService supplierService;
@@ -26,12 +26,7 @@ public class SupplierController {
         return ResponseEntity.ok(supplierService.findAllSuppliers());
     }
 
-    @GetMapping("/ice/{ice}")
-    public ResponseEntity<SupplierResponseDTO> getSupplierByIce(@PathVariable String ice){
-        return ResponseEntity.ok(supplierService.findByIce(ice));
-    }
-
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<SupplierResponseDTO> getSupplierById(@PathVariable Long id){
         return ResponseEntity.ok(supplierService.findById(id));
     }
