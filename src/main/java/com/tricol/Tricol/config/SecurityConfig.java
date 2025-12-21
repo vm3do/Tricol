@@ -1,7 +1,7 @@
 package com.tricol.Tricol.config;
 
-import com.tricol.Tricol.filter.JwtAuthenticationFilter;
-import com.tricol.Tricol.service.CustomUserDetailsService;
+import com.tricol.Tricol.security.filter.JwtAuthenticationFilter;
+import com.tricol.Tricol.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +52,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

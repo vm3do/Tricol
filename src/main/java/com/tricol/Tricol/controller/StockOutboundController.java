@@ -3,6 +3,8 @@ package com.tricol.Tricol.controller;
 import com.tricol.Tricol.dto.request.create.StockOutboundRequestDTO;
 import com.tricol.Tricol.dto.request.update.StockOutboundUpdateDTO;
 import com.tricol.Tricol.dto.response.StockOutboundResponseDTO;
+import com.tricol.Tricol.model.StockMovement;
+import com.tricol.Tricol.repository.StockMovementRepository;
 import com.tricol.Tricol.service.StockOutboundService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,12 +20,20 @@ import java.util.List;
 public class StockOutboundController {
 
     private final StockOutboundService stockOutboundService;
+    private final StockMovementRepository stockMovementRepository;
 
     @GetMapping
     @PreAuthorize("hasAuthority('VIEW_BON_SORTIE')")
     public ResponseEntity<List<StockOutboundResponseDTO>> getAllOutbounds() {
         return ResponseEntity.ok(stockOutboundService.getAll());
     }
+
+    @GetMapping("/test11")
+    public ResponseEntity<List<Object[]>> getAllMovementsWith() {
+        return ResponseEntity.ok(stockMovementRepository.findAllWithTypeAndNombreMovement());
+    }
+
+
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('VIEW_BON_SORTIE')")

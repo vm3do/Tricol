@@ -56,7 +56,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        try {
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
@@ -68,7 +68,7 @@ public class AuthController {
 
             UserApp user = userRepository.findByEmail(request.getEmail()).orElse(null);
             if (user != null) {
-                auditService.logSuccess(AuditAction.LOGIN_SUCCESS, AuditResourceType.AUTHENTICATION, user.getId());
+                auditService.logWithUser(user, AuditAction.LOGIN_SUCCESS, AuditResourceType.AUTHENTICATION, user.getId(), AuditResult.SUCCESS);
             }
 
             AuthResponse response = AuthResponse.builder()
@@ -78,12 +78,5 @@ public class AuthController {
                     .build();
 
             return ResponseEntity.ok(response);
-        } catch (BadCredentialsException e) {
-            UserApp user = userRepository.findByEmail(request.getEmail()).orElse(null);
-            if (user != null) {
-                auditService.logFailure(AuditAction.LOGIN_FAILURE, AuditResourceType.AUTHENTICATION, user.getId());
-            }
-            throw e;
-        }
     }
 }

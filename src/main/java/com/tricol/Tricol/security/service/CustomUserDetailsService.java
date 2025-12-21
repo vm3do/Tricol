@@ -1,8 +1,9 @@
-package com.tricol.Tricol.service;
+package com.tricol.Tricol.security.service;
 
 import com.tricol.Tricol.model.Permission;
 import com.tricol.Tricol.model.UserApp;
 import com.tricol.Tricol.repository.UserRepository;
+import com.tricol.Tricol.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

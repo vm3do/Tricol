@@ -52,4 +52,17 @@ public class AuditService {
     public void logFailure(AuditAction action, AuditResourceType resourceType, Long resourceId) {
         log(action, resourceType, resourceId, AuditResult.FAILURE);
     }
+
+    @Transactional
+    public void logWithUser(UserApp user, AuditAction action, AuditResourceType resourceType, Long resourceId, AuditResult result){
+        AuditLog auditLog = AuditLog.builder()
+                .user(user)
+                .action(action)
+                .resourceType(resourceType)
+                .resourceId(resourceId)
+                .result(result)
+                .build();
+
+        auditLogRepository.save(auditLog);
+    }
 }
