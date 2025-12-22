@@ -1,5 +1,7 @@
 package com.tricol.Tricol.config;
 
+import com.tricol.Tricol.security.CustomAccessDeniedHandler;
+import com.tricol.Tricol.security.CustomAuthenticationEntryPoint;
 import com.tricol.Tricol.security.filter.JwtAuthenticationFilter;
 import com.tricol.Tricol.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -50,6 +54,11 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling( exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                )
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("api/admin/**").hasRole("ADMIN")
