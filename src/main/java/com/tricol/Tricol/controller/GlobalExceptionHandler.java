@@ -37,26 +37,6 @@ public class GlobalExceptionHandler {
                 .body(errors);
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<HashMap<String, String>> handleUnauthorized(BadCredentialsException ex) {
-        HashMap<String, String> errors = new HashMap<>();
-        errors.put("error", ex.getMessage());
-        errors.put("status", "401");
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(errors);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<HashMap<String, String>> handleForbidden(AccessDeniedException ex) {
-        HashMap<String, String> errors = new HashMap<>();
-        errors.put("error", ex.getMessage());
-        errors.put("status", "403");
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(errors);
-    }
-
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handleIllegalState(IllegalStateException ex) {
         return ResponseEntity
