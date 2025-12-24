@@ -1,6 +1,7 @@
 package com.tricol.Tricol.security.service;
 
 import com.tricol.Tricol.model.Permission;
+import com.tricol.Tricol.model.RoleApp;
 import com.tricol.Tricol.model.UserApp;
 import com.tricol.Tricol.repository.UserRepository;
 import com.tricol.Tricol.service.PermissionService;
@@ -32,9 +33,17 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Set<Permission> permissions = permissionService.getUserPermissions(user);
 
-        List<GrantedAuthority> authorities = permissions.stream()
+        Set<GrantedAuthority> authorities = permissions.stream()
                 .map(p -> new SimpleGrantedAuthority(p.getName()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
+
+//        RoleApp role = user.getRole();
+//        SimpleGrantedAuthority roleAuthority = new SimpleGrantedAuthority(role.getName());
+
+        if(user.getRole() != null){
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
+        }
+
 
         return User.builder()
                 .username(user.getEmail())

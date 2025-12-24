@@ -42,20 +42,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (!jwtUtil.validateToken(token)) {
                 throw new AuthenticationException("Invalid JWT token") {};
             }
+
+            String username = jwtUtil.extractUsername(token);
+            List<GrantedAuthority> authorities = jwtUtil.extractAuthorities(token);
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(username, null, authorities);
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
         } catch (JwtException | AuthenticationException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid or expired token");
-            return;
+            SecurityContextHolder.clearContext();
         }
-
-        String username = jwtUtil.extractUsername(token);
-        List<GrantedAuthority> authorities = jwtUtil.extractAuthorities(token);
-
-        UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(username, null, authorities);
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }
