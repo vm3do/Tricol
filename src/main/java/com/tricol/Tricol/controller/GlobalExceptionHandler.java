@@ -1,17 +1,17 @@
 package com.tricol.Tricol.controller;
 
+import com.tricol.Tricol.dto.response.ErrorResponse;
 import com.tricol.Tricol.exception.DuplicateResourceException;
 import com.tricol.Tricol.exception.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,39 +20,48 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<HashMap<String, String>> handleResourceNotFound(ResourceNotFoundException ex) {
-        HashMap<String, String> errors = new HashMap<>();
-        errors.put("error", ex.getMessage());
-        errors.put("status", "404");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<HashMap<String, String>> handleDuplicate(DuplicateResourceException ex) {
-        HashMap<String, String> errors = new HashMap<>();
-        errors.put("error", ex.getMessage());
-        errors.put("status", "409");
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(errors);
+    public ResponseEntity<ErrorResponse> handleDuplicate(DuplicateResourceException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleIllegalState(IllegalStateException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
+        for( FieldError error : ex.getBindingResult().getFieldErrors()) {
+            String fieldName = error.getField();
+            String message = error.getDefaultMessage();
+            errors.put(fieldName, message);
+        }
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(errors);
@@ -60,7 +69,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         String message = "Database constraint violation";
         if (ex.getMessage() != null) {
             if (ex.getMessage().contains("foreign key")) {
@@ -69,17 +78,26 @@ public class GlobalExceptionHandler {
                 message = "This record already exists";
             }
         }
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(message);
+
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGlobal(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Something went wrong: " + ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleGlobal(Exception ex) {
+        ErrorResponse error = ErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("Internal Server Error")
+                .message("Something went wrong: " + ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
 

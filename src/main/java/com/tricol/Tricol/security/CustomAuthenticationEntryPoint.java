@@ -2,7 +2,6 @@ package com.tricol.Tricol.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tricol.Tricol.dto.response.ErrorResponse;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +19,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         ErrorResponse errorResp = ErrorResponse.builder()
                 .status(HttpServletResponse.SC_UNAUTHORIZED)
                 .error("Unauthorized")
                 .message(authException.getMessage())
+                .timestamp(java.time.LocalDateTime.now())
                 .build();
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
