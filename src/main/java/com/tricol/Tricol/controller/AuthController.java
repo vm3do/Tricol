@@ -11,6 +11,7 @@ import com.tricol.Tricol.repository.UserRepository;
 import com.tricol.Tricol.service.AuditService;
 import com.tricol.Tricol.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,6 +22,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @RestController
@@ -69,10 +71,12 @@ public class AuthController {
             String accessToken = jwtUtil.generateAccessToken(request.getEmail(), authorities);
             String refreshToken = jwtUtil.generateRefreshToken(request.getEmail());
 
-            UserApp user = userRepository.findByEmail(request.getEmail()).orElse(null);
-            if (user != null) {
-                auditService.logWithUser(user, AuditAction.LOGIN_SUCCESS, AuditResourceType.AUTHENTICATION, user.getId(), AuditResult.SUCCESS);
-            }
+            UserApp user = userRepository.findByEmail(authentication.getName()).orElseThrow();
+
+            auditService.logWithUser(user, AuditAction.LOGIN_SUCCESS, AuditResourceType.AUTHENTICATION, user.getId(), AuditResult.SUCCESS);
+            user.setLastLoginAt(LocalDateTime.now());
+            userRepository.save(user);
+
 
             AuthResponse response = AuthResponse.builder()
                     .accessToken(accessToken)
