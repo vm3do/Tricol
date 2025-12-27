@@ -23,7 +23,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         ErrorResponse errorResp = ErrorResponse.builder()
                 .status(HttpServletResponse.SC_UNAUTHORIZED)
                 .error("Unauthorized")
-                .message(authException.getMessage())
+//                .message(authException.getMessage())
+                .message("Invalid or expired token")
                 .timestamp(java.time.LocalDateTime.now())
                 .build();
 
