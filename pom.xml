@@ -100,6 +100,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- oauth resource server -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+
 	</dependencies>
 
 	<build>
