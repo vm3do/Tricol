@@ -9,10 +9,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
+import java.util.Collection;
 
+@Component
 @RequiredArgsConstructor
 public class JwtAuthManagerResolver implements AuthenticationManagerResolver<HttpServletRequest> {
 
@@ -22,11 +28,10 @@ public class JwtAuthManagerResolver implements AuthenticationManagerResolver<Htt
     private String keycloakIssuer;
 
     @Qualifier("localJwtDecoder")
-    private JwtDecoder localJwtDecoder;
+    private final JwtDecoder localJwtDecoder;
     @Qualifier("keycloakJwtDecoder")
-    private JwtDecoder keycloakJwtDecoder;
+    private final JwtDecoder keycloakJwtDecoder;
 
-    private final JwtUtil jwtUtil;
     private final JwtAuthoritiesConverter jwtAuthoritiesConverter;
 
     @Override
@@ -38,7 +43,11 @@ public class JwtAuthManagerResolver implements AuthenticationManagerResolver<Htt
         }
 
         String issuer = extractIssuer(token);
-        return null;
+        if(issuer.equals(localIssuer)){
+            return createAuthManager(localJwtDecoder);
+        } else {
+            return createAuthManager(keycloakJwtDecoder);
+        }
 
     }
 
@@ -62,6 +71,27 @@ public class JwtAuthManagerResolver implements AuthenticationManagerResolver<Htt
         } catch (ParseException parseException){
             return "invalid jwt";
         }
+    }
+
+    private AuthenticationManager createAuthManager(JwtDecoder decoder){
+        // had provider kaydecodi, ivalider signature + claims & ysweb autnetication object;
+        // decode using our decoder
+        //validae
+        //convert decoded jwt to authentication object
+        JwtAuthenticationProvider provider = new JwtAuthenticationProvider(decoder);
+
+        //jwt is the decoded token
+        provider.setJwtAuthenticationConverter(jwt -> {
+            Collection<GrantedAuthority> authorities =
+                    jwtAuthoritiesConverter.convert(jwt);
+            //authentication object with authorities
+            return new JwtAuthenticationToken(jwt, authorities);
+        });
+
+        //nefs method schema dyal AuthenticationManager
+        //Equivalent to: token -> provider.authenticate(token)
+        return provider::authenticate;
+
     }
 
 
