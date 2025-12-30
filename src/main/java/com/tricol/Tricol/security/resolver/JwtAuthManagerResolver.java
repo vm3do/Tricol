@@ -39,13 +39,23 @@ public class JwtAuthManagerResolver implements AuthenticationManagerResolver<Htt
         String token = extractToken(request);
 
         if(token == null){
+            System.out.println("⚠️ DEBUG: No Bearer token found in request");
             return null;
         }
 
         String issuer = extractIssuer(token);
+
+        // TEMPORARY DEBUG - REMOVE LATER
+        System.out.println("🔍 DEBUG: Token issuer: '" + issuer + "'");
+        System.out.println("🔍 DEBUG: Expected local issuer: '" + localIssuer + "'");
+        System.out.println("🔍 DEBUG: Keycloak issuer: '" + keycloakIssuer + "'");
+        System.out.println("🔍 DEBUG: Match with local: " + issuer.equals(localIssuer));
+
         if(issuer.equals(localIssuer)){
+            System.out.println("✅ DEBUG: Routing to LOCAL decoder");
             return createAuthManager(localJwtDecoder);
         } else {
+            System.out.println("✅ DEBUG: Routing to KEYCLOAK decoder");
             return createAuthManager(keycloakJwtDecoder);
         }
 
@@ -76,7 +86,7 @@ public class JwtAuthManagerResolver implements AuthenticationManagerResolver<Htt
     private AuthenticationManager createAuthManager(JwtDecoder decoder){
         // had provider kaydecodi, ivalider signature + claims & ysweb autnetication object;
         // decode using our decoder
-        //validae
+        //validate
         //convert decoded jwt to authentication object
         JwtAuthenticationProvider provider = new JwtAuthenticationProvider(decoder);
 
@@ -88,9 +98,22 @@ public class JwtAuthManagerResolver implements AuthenticationManagerResolver<Htt
             return new JwtAuthenticationToken(jwt, authorities);
         });
 
-        //nefs method schema dyal AuthenticationManager
-        //Equivalent to: token -> provider.authenticate(token)
-        return provider::authenticate;
+        // TEMPORARY DEBUG - Wrap to catch exact error
+        return authentication -> {
+            try {
+                System.out.println("🔍 DEBUG: Attempting to authenticate with decoder...");
+                return provider.authenticate(authentication);
+            } catch (Exception e) {
+                System.out.println("❌ DEBUG: Authentication failed!");
+                System.out.println("❌ DEBUG: Error type: " + e.getClass().getName());
+                System.out.println("❌ DEBUG: Error message: " + e.getMessage());
+                if (e.getCause() != null) {
+                    System.out.println("❌ DEBUG: Caused by: " + e.getCause().getClass().getName());
+                    System.out.println("❌ DEBUG: Cause message: " + e.getCause().getMessage());
+                }
+                throw e;
+            }
+        };
 
     }
 

@@ -73,11 +73,16 @@ public class JwtAuthoritiesConverter implements Converter<Jwt, Collection<Grante
                 authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
                 Set<Permission> permissions = role.getPermissions();
 
+
                 for(Permission permission : permissions){
                     authorities.add(new SimpleGrantedAuthority(permission.getName()));
                 }
+            } else {
+                System.out.println("DEBUG: Role '" + roleName + "' NOT FOUND in database!");
             }
         }
+
+        System.out.println("DEBUG: Final authorities for Keycloak token: " + authorities);
 
         return authorities;
     }

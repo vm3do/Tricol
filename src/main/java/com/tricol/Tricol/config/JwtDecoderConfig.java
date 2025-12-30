@@ -29,9 +29,7 @@ public class JwtDecoderConfig {
     @Qualifier("localJwtDecoder")
     public JwtDecoder localJwtDecoder(){
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(key).build();
-        decoder.setJwtValidator(new JwtIssuerValidator(localIssuer));
-        return decoder;
+        return NimbusJwtDecoder.withSecretKey(key).build();
     }
 
     @Bean
