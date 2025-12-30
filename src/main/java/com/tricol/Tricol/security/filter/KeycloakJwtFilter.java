@@ -60,7 +60,6 @@ public class KeycloakJwtFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
-            return;
 
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
