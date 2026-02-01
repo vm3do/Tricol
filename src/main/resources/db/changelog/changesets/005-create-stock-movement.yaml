@@ -1,0 +1,107 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-stock-movement
+      author: medoa
+      changes:
+        - createTable:
+            tableName: stock_movement
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: stock_lot_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: movement_type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: unit_price
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: supplier_order_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: reference
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: notes
+                  type: TEXT
+                  constraints:
+                    nullable: true
+              - column:
+                  name: movement_date
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: stock_movement
+            baseColumnNames: product_id
+            constraintName: fk_stock_movement_product
+            referencedTableName: product
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: stock_movement
+            baseColumnNames: stock_lot_id
+            constraintName: fk_stock_movement_stock_lot
+            referencedTableName: stock_lot
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        - addForeignKeyConstraint:
+            baseTableName: stock_movement
+            baseColumnNames: supplier_order_id
+            constraintName: fk_stock_movement_supplier_order
+            referencedTableName: supplier_order
+            referencedColumnNames: id
+            onDelete: SET NULL
+
+        - createIndex:
+            indexName: idx_stock_movement_product
+            tableName: stock_movement
+            columns:
+              - column:
+                  name: product_id
+
+        - createIndex:
+            indexName: idx_stock_movement_type
+            tableName: stock_movement
+            columns:
+              - column:
+                  name: movement_type
+
+        - createIndex:
+            indexName: idx_stock_movement_date
+            tableName: stock_movement
+            columns:
+              - column:
+                  name: movement_date
+

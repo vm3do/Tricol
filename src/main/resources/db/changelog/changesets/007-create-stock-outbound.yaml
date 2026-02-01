@@ -1,0 +1,106 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-create-stock-outbound
+      author: system
+      changes:
+        - createTable:
+            tableName: stock_outbound
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: reference
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: reason
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: workshop
+                  type: VARCHAR(100)
+              - column:
+                  name: notes
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: stock_outbound_item
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: stock_outbound_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: notes
+                  type: VARCHAR(255)
+        - addForeignKeyConstraint:
+            baseTableName: stock_outbound_item
+            baseColumnNames: stock_outbound_id
+            referencedTableName: stock_outbound
+            referencedColumnNames: id
+            constraintName: fk_stock_outbound_item_outbound
+        - addForeignKeyConstraint:
+            baseTableName: stock_outbound_item
+            baseColumnNames: product_id
+            referencedTableName: product
+            referencedColumnNames: id
+            constraintName: fk_stock_outbound_item_product
+        - createIndex:
+            tableName: stock_outbound
+            indexName: idx_stock_outbound_status
+            columns:
+              - column:
+                  name: status
+        - createIndex:
+            tableName: stock_outbound
+            indexName: idx_stock_outbound_workshop
+            columns:
+              - column:
+                  name: workshop
+      rollback:
+        - dropTable:
+            tableName: stock_outbound_item
+        - dropTable:
+            tableName: stock_outbound

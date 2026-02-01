@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1762708923418-1
+      author: LENOVO
+      changes:
+        - createTable:
+            tableName: supplier_order
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_supplier_order
+              - column:
+                  name: supplier_id
+                  type: BIGINT
+              - column:
+                  name: order_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_amount
+                  type: DECIMAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 1762708923418-2
+      author: LENOVO
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: supplier_id
+            baseTableName: supplier_order
+            constraintName: FK_SUPPLIER_ORDER_ON_SUPPLIER
+            referencedColumnNames: id
+            referencedTableName: supplier
+

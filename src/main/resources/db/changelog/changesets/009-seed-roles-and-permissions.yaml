@@ -1,0 +1,224 @@
+databaseChangeLog:
+  - changeSet:
+      id: 009-seed-roles-and-permissions
+      author: mohamed
+      changes:
+        # Insert Roles
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: name, value: "ADMIN" }
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: name, value: "RESPONSABLE_ACHATS" }
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: name, value: "MAGASINIER" }
+        - insert:
+            tableName: roles
+            columns:
+              - column: { name: name, value: "CHEF_ATELIER" }
+
+        # Insert Permissions - Suppliers
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "CREATE_SUPPLIER" }
+              - column: { name: resource, value: "SUPPLIER" }
+              - column: { name: action, value: "CREATE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "UPDATE_SUPPLIER" }
+              - column: { name: resource, value: "SUPPLIER" }
+              - column: { name: action, value: "UPDATE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "DELETE_SUPPLIER" }
+              - column: { name: resource, value: "SUPPLIER" }
+              - column: { name: action, value: "DELETE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VIEW_SUPPLIER" }
+              - column: { name: resource, value: "SUPPLIER" }
+              - column: { name: action, value: "VIEW" }
+
+        # Insert Permissions - Products
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "CREATE_PRODUCT" }
+              - column: { name: resource, value: "PRODUCT" }
+              - column: { name: action, value: "CREATE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "UPDATE_PRODUCT" }
+              - column: { name: resource, value: "PRODUCT" }
+              - column: { name: action, value: "UPDATE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "DELETE_PRODUCT" }
+              - column: { name: resource, value: "PRODUCT" }
+              - column: { name: action, value: "DELETE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VIEW_PRODUCT" }
+              - column: { name: resource, value: "PRODUCT" }
+              - column: { name: action, value: "VIEW" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "CONFIGURE_PRODUCT_THRESHOLD" }
+              - column: { name: resource, value: "PRODUCT" }
+              - column: { name: action, value: "CONFIGURE" }
+
+        # Insert Permissions - Orders
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "CREATE_ORDER" }
+              - column: { name: resource, value: "ORDER" }
+              - column: { name: action, value: "CREATE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "UPDATE_ORDER" }
+              - column: { name: resource, value: "ORDER" }
+              - column: { name: action, value: "UPDATE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VALIDATE_ORDER" }
+              - column: { name: resource, value: "ORDER" }
+              - column: { name: action, value: "VALIDATE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "CANCEL_ORDER" }
+              - column: { name: resource, value: "ORDER" }
+              - column: { name: action, value: "CANCEL" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "RECEIVE_ORDER" }
+              - column: { name: resource, value: "ORDER" }
+              - column: { name: action, value: "RECEIVE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VIEW_ORDER" }
+              - column: { name: resource, value: "ORDER" }
+              - column: { name: action, value: "VIEW" }
+
+        # Insert Permissions - Stock
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VIEW_STOCK" }
+              - column: { name: resource, value: "STOCK" }
+              - column: { name: action, value: "VIEW" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VIEW_STOCK_VALUATION" }
+              - column: { name: resource, value: "STOCK" }
+              - column: { name: action, value: "VIEW_VALUATION" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VIEW_STOCK_HISTORY" }
+              - column: { name: resource, value: "STOCK" }
+              - column: { name: action, value: "VIEW_HISTORY" }
+
+        # Insert Permissions - Bon de Sortie
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "CREATE_BON_SORTIE" }
+              - column: { name: resource, value: "BON_SORTIE" }
+              - column: { name: action, value: "CREATE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VALIDATE_BON_SORTIE" }
+              - column: { name: resource, value: "BON_SORTIE" }
+              - column: { name: action, value: "VALIDATE" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "CANCEL_BON_SORTIE" }
+              - column: { name: resource, value: "BON_SORTIE" }
+              - column: { name: action, value: "CANCEL" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VIEW_BON_SORTIE" }
+              - column: { name: resource, value: "BON_SORTIE" }
+              - column: { name: action, value: "VIEW" }
+
+        # Insert Permissions - Administration
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "MANAGE_USERS" }
+              - column: { name: resource, value: "ADMIN" }
+              - column: { name: action, value: "MANAGE_USERS" }
+        - insert:
+            tableName: permissions
+            columns:
+              - column: { name: name, value: "VIEW_AUDIT_LOGS" }
+              - column: { name: resource, value: "ADMIN" }
+              - column: { name: action, value: "VIEW_AUDIT" }
+
+        # Role-Permission Mappings - ADMIN (gets all permissions)
+        - sql:
+            sql: >
+              INSERT INTO role_permission (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r, permissions p WHERE r.name = 'ADMIN';
+
+        # Role-Permission Mappings - RESPONSABLE_ACHATS
+        - sql:
+            sql: >
+              INSERT INTO role_permission (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r, permissions p 
+              WHERE r.name = 'RESPONSABLE_ACHATS' 
+              AND p.name IN (
+                'CREATE_SUPPLIER', 'UPDATE_SUPPLIER', 'DELETE_SUPPLIER', 'VIEW_SUPPLIER',
+                'CREATE_PRODUCT', 'UPDATE_PRODUCT', 'DELETE_PRODUCT', 'VIEW_PRODUCT', 'CONFIGURE_PRODUCT_THRESHOLD',
+                'CREATE_ORDER', 'UPDATE_ORDER', 'VALIDATE_ORDER', 'CANCEL_ORDER', 'VIEW_ORDER',
+                'VIEW_STOCK', 'VIEW_STOCK_VALUATION', 'VIEW_STOCK_HISTORY',
+                'VIEW_BON_SORTIE'
+              );
+
+        # Role-Permission Mappings - MAGASINIER
+        - sql:
+            sql: >
+              INSERT INTO role_permission (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r, permissions p 
+              WHERE r.name = 'MAGASINIER' 
+              AND p.name IN (
+                'VIEW_SUPPLIER',
+                'VIEW_PRODUCT',
+                'RECEIVE_ORDER', 'VIEW_ORDER',
+                'VIEW_STOCK', 'VIEW_STOCK_VALUATION', 'VIEW_STOCK_HISTORY',
+                'CREATE_BON_SORTIE', 'VALIDATE_BON_SORTIE', 'CANCEL_BON_SORTIE', 'VIEW_BON_SORTIE'
+              );
+
+        # Role-Permission Mappings - CHEF_ATELIER
+        - sql:
+            sql: >
+              INSERT INTO role_permission (role_id, permission_id)
+              SELECT r.id, p.id FROM roles r, permissions p 
+              WHERE r.name = 'CHEF_ATELIER' 
+              AND p.name IN (
+                'VIEW_PRODUCT',
+                'VIEW_STOCK', 'VIEW_STOCK_HISTORY',
+                'CREATE_BON_SORTIE', 'VIEW_BON_SORTIE'
+              );

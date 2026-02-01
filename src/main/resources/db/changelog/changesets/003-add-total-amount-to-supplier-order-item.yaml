@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-add-total-amount-to-supplier-order-item
+      author: mohamed
+      changes:
+        - addColumn:
+            tableName: supplier_order_item
+            columns:
+              - column:
+                  name: total_amount
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0
+

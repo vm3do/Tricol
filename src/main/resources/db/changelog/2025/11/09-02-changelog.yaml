@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1762708965898-1
+      author: LENOVO
+      changes:
+        - createTable:
+            tableName: supplier_order_item
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_supplier_order_item
+              - column:
+                  name: order_id
+                  type: BIGINT
+              - column:
+                  name: product_id
+                  type: BIGINT
+              - column:
+                  name: quantity
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: unit_price
+                  type: DECIMAL
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 1762708965898-2
+      author: LENOVO
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: supplier_order_item
+            constraintName: FK_SUPPLIER_ORDER_ITEM_ON_ORDER
+            referencedColumnNames: id
+            referencedTableName: supplier_order
+  - changeSet:
+      id: 1762708965898-3
+      author: LENOVO
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: product_id
+            baseTableName: supplier_order_item
+            constraintName: FK_SUPPLIER_ORDER_ITEM_ON_PRODUCT
+            referencedColumnNames: id
+            referencedTableName: product
+

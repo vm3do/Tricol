@@ -1,0 +1,484 @@
+# ============================================
+# STEP 1: REGISTER ADMIN USER
+# ============================================
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@tricol.com",
+  "password": "admin123",
+  "fullName": "Admin User"
+}
+
+# ============================================
+# STEP 2: MANUALLY SET ADMIN ROLE (RUN IN DATABASE)
+# ============================================
+# Run this SQL query in your database:
+# UPDATE users SET role_id = 1 WHERE email = 'admin@tricol.com';
+
+# ============================================
+# STEP 3: LOGIN AS ADMIN
+# ============================================
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@tricol.com",
+  "password": "admin123"
+}
+
+# Response will give you accessToken - SAVE IT!
+# Use it in Authorization header for admin endpoints
+
+# ============================================
+# STEP 4: REGISTER REGULAR USERS
+# ============================================
+
+# Register Amine (MAGASINIER)
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "amine@tricol.com",
+  "password": "password123",
+  "fullName": "Amine Benali"
+}
+
+###
+
+# Register Sara (RESPONSABLE_ACHATS)
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "sara@tricol.com",
+  "password": "password123",
+  "fullName": "Sara Alami"
+}
+
+###
+
+# Register Hassan (MAGASINIER)
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "hassan@tricol.com",
+  "password": "password123",
+  "fullName": "Hassan Idrissi"
+}
+
+###
+
+# Register Fatima (CHEF_ATELIER)
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "fatima@tricol.com",
+  "password": "password123",
+  "fullName": "Fatima Zahra"
+}
+
+# ============================================
+# STEP 5: ASSIGN ROLES (USE ADMIN TOKEN)
+# ============================================
+
+# Assign MAGASINIER to Amine (userId: 2)
+POST http://localhost:8080/api/admin/users/assign-role
+Content-Type: application/json
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+{
+  "userId": 2,
+  "roleName": "MAGASINIER"
+}
+
+###
+
+# Assign RESPONSABLE_ACHATS to Sara (userId: 3)
+POST http://localhost:8080/api/admin/users/assign-role
+Content-Type: application/json
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+{
+  "userId": 3,
+  "roleName": "RESPONSABLE_ACHATS"
+}
+
+###
+
+# Assign MAGASINIER to Hassan (userId: 4)
+POST http://localhost:8080/api/admin/users/assign-role
+Content-Type: application/json
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+{
+  "userId": 4,
+  "roleName": "MAGASINIER"
+}
+
+###
+
+# Assign CHEF_ATELIER to Fatima (userId: 5)
+POST http://localhost:8080/api/admin/users/assign-role
+Content-Type: application/json
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+{
+  "userId": 5,
+  "roleName": "CHEF_ATELIER"
+}
+
+# ============================================
+# STEP 6: LOGIN AS REGULAR USERS
+# ============================================
+
+# Login as Amine
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "amine@tricol.com",
+  "password": "password123"
+}
+
+###
+
+# Login as Sara
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "sara@tricol.com",
+  "password": "password123"
+}
+
+###
+
+# Login as Hassan
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "hassan@tricol.com",
+  "password": "password123"
+}
+
+###
+
+# Login as Fatima
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "fatima@tricol.com",
+  "password": "password123"
+}
+
+# ============================================
+# STEP 7: TEST PROTECTED ENDPOINTS
+# ============================================
+
+# Get all products (Requires VIEW_PRODUCT)
+# MAGASINIER, RESPONSABLE_ACHATS, CHEF_ATELIER, ADMIN can access
+GET http://localhost:8080/api/products
+Authorization: Bearer <USER_ACCESS_TOKEN>
+
+###
+
+# Get all suppliers (Requires VIEW_SUPPLIER)
+# MAGASINIER, RESPONSABLE_ACHATS, ADMIN can access
+GET http://localhost:8080/api/suppliers
+Authorization: Bearer <USER_ACCESS_TOKEN>
+
+###
+
+# Create supplier (Requires CREATE_SUPPLIER)
+# Only RESPONSABLE_ACHATS, ADMIN can access
+POST http://localhost:8080/api/suppliers
+Content-Type: application/json
+Authorization: Bearer <SARA_OR_ADMIN_TOKEN>
+
+{
+  "name": "Fournisseur Test",
+  "email": "test@supplier.com",
+  "phone": "0612345678",
+  "address": "123 Rue Test, Casablanca"
+}
+
+###
+
+# Create product (Requires CREATE_PRODUCT)
+# Only RESPONSABLE_ACHATS, ADMIN can access
+POST http://localhost:8080/api/products
+Content-Type: application/json
+Authorization: Bearer <SARA_OR_ADMIN_TOKEN>
+
+{
+  "reference": "PROD001",
+  "name": "Tissu Coton",
+  "description": "Tissu coton haute qualité",
+  "unitPrice": 150.00,
+  "category": "Tissu",
+  "reorderPoint": 100,
+  "unit": "mètre"
+}
+
+###
+
+# Validate order (Requires VALIDATE_ORDER)
+# Only RESPONSABLE_ACHATS, ADMIN can access
+PUT http://localhost:8080/api/orders/1/validate
+Authorization: Bearer <SARA_OR_ADMIN_TOKEN>
+
+###
+
+# Receive order (Requires RECEIVE_ORDER)
+# Only MAGASINIER, ADMIN can access
+PUT http://localhost:8080/api/orders/1/receive
+Authorization: Bearer <AMINE_OR_ADMIN_TOKEN>
+
+###
+
+# Create bon de sortie (Requires CREATE_BON_SORTIE)
+# MAGASINIER, CHEF_ATELIER, ADMIN can access
+POST http://localhost:8080/api/stock-outbound
+Content-Type: application/json
+Authorization: Bearer <AMINE_OR_FATIMA_OR_ADMIN_TOKEN>
+
+{
+  "workshop": "Atelier A",
+  "reason": "PRODUCTION",
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 50
+    }
+  ]
+}
+
+###
+
+# Validate bon de sortie (Requires VALIDATE_BON_SORTIE)
+# Only MAGASINIER, ADMIN can access
+PUT http://localhost:8080/api/stock-outbound/1/validate
+Authorization: Bearer <AMINE_OR_ADMIN_TOKEN>
+
+# ============================================
+# STEP 8: PERMISSION OVERRIDES (USE ADMIN TOKEN)
+# ============================================
+
+# Revoke CREATE_BON_SORTIE from Amine
+POST http://localhost:8080/api/admin/users/permission-override
+Content-Type: application/json
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+{
+  "userId": 2,
+  "permissionName": "CREATE_BON_SORTIE",
+  "granted": false,
+  "reason": "Training period restriction"
+}
+
+###
+
+# Grant VIEW_AUDIT_LOGS to Sara (normally only ADMIN)
+POST http://localhost:8080/api/admin/users/permission-override
+Content-Type: application/json
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+{
+  "userId": 3,
+  "permissionName": "VIEW_AUDIT_LOGS",
+  "granted": true,
+  "reason": "Compliance review access"
+}
+
+###
+
+# Revoke DELETE_SUPPLIER from Sara
+POST http://localhost:8080/api/admin/users/permission-override
+Content-Type: application/json
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+{
+  "userId": 3,
+  "permissionName": "DELETE_SUPPLIER",
+  "granted": false,
+  "reason": "Safety measure"
+}
+
+# ============================================
+# STEP 9: TEST AFTER PERMISSION OVERRIDE
+# ============================================
+
+# Amine must login again to get new JWT without CREATE_BON_SORTIE
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "amine@tricol.com",
+  "password": "password123"
+}
+
+###
+
+# Try to create bon de sortie with new token
+# Expected: 403 Forbidden
+POST http://localhost:8080/api/stock-outbound
+Content-Type: application/json
+Authorization: Bearer <NEW_AMINE_TOKEN>
+
+{
+  "workshop": "Atelier A",
+  "reason": "PRODUCTION",
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 50
+    }
+  ]
+}
+
+# ============================================
+# STEP 10: ADMIN ENDPOINTS
+# ============================================
+
+# Get all users
+GET http://localhost:8080/api/admin/users
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+###
+
+# Get all roles
+GET http://localhost:8080/api/admin/roles
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+###
+
+# Get all permissions
+GET http://localhost:8080/api/admin/permissions
+Authorization: Bearer <ADMIN_ACCESS_TOKEN>
+
+# ============================================
+# EXPECTED RESULTS SUMMARY
+# ============================================
+
+# ADMIN:
+# - Can access ALL endpoints
+# - Can manage users, roles, permissions
+
+# RESPONSABLE_ACHATS (Sara):
+# - Can create/update/delete suppliers
+# - Can create/update/delete products
+# - Can create/validate/cancel orders
+# - Can view stock
+# - Can view bon de sortie
+# - CANNOT receive orders
+# - CANNOT create/validate bon de sortie
+
+# MAGASINIER (Amine/Hassan):
+# - Can view suppliers
+# - Can view products
+# - Can receive orders
+# - Can view stock
+# - Can create/validate/cancel bon de sortie
+# - CANNOT create/update/delete suppliers
+# - CANNOT create/update/delete products
+# - CANNOT create/validate orders
+
+# CHEF_ATELIER (Fatima):
+# - Can view products
+# - Can view stock
+# - Can create bon de sortie
+# - Can view bon de sortie
+# - CANNOT validate bon de sortie
+# - CANNOT access suppliers
+# - CANNOT access orders
+
+# ============================================
+# PERMISSION OVERRIDE EXAMPLES
+# ============================================
+
+# After revoking CREATE_BON_SORTIE from Amine:
+# - Amine can still view bon de sortie
+# - Amine can still validate bon de sortie
+# - Amine CANNOT create bon de sortie anymore
+
+# After granting VIEW_AUDIT_LOGS to Sara:
+# - Sara can now view audit logs (normally only ADMIN)
+# - Sara keeps all her RESPONSABLE_ACHATS permissions
+
+# ============================================
+# TESTING FORBIDDEN ACCESS
+# ============================================
+
+# Amine tries to create supplier (should fail)
+POST http://localhost:8080/api/suppliers
+Content-Type: application/json
+Authorization: Bearer <AMINE_TOKEN>
+
+{
+  "name": "Test Supplier",
+  "email": "test@test.com",
+  "phone": "0612345678",
+  "address": "Test Address"
+}
+# Expected: 403 Forbidden
+
+###
+
+# Fatima tries to validate bon de sortie (should fail)
+PUT http://localhost:8080/api/stock-outbound/1/validate
+Authorization: Bearer <FATIMA_TOKEN>
+# Expected: 403 Forbidden
+
+###
+
+# Hassan tries to create order (should fail)
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+Authorization: Bearer <HASSAN_TOKEN>
+
+{
+  "supplierId": 1,
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 100,
+      "unitPrice": 150.00
+    }
+  ]
+}
+# Expected: 403 Forbidden
+
+# ============================================
+# AUDIT LOG QUERIES (RUN IN DATABASE)
+# ============================================
+
+# See all audit logs
+# SELECT * FROM audit_logs ORDER BY timestamp DESC;
+
+# See all login attempts
+# SELECT * FROM audit_logs WHERE action LIKE 'LOGIN%';
+
+# See all permission changes
+# SELECT * FROM audit_logs WHERE action IN ('PERMISSION_GRANTED', 'PERMISSION_REVOKED');
+
+# See Amine's actions
+# SELECT * FROM audit_logs WHERE user_id = 2;
+
+# See failed actions
+# SELECT * FROM audit_logs WHERE result = 'FAILURE';
+
+# ============================================
+# NOTES
+# ============================================
+
+# 1. Replace <ADMIN_ACCESS_TOKEN> with actual token from admin login
+# 2. Replace <USER_ACCESS_TOKEN> with actual token from user login
+# 3. User IDs may vary - check your database
+# 4. After permission override, user must login again to get new JWT
+# 5. JWT expires in 30 minutes - login again if expired
+# 6. All passwords in examples are "password123" or "admin123"

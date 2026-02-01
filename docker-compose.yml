@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mysql_kc:
+    image: mysql:8.0
+    container_name: tricol_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: NewPass123!
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: tricol_user
+      MYSQL_PASSWORD: NewPass123!
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - tricol-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: tricol-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://mysql_kc:3306/keycloak
+      KC_DB_USERNAME: tricol_user
+      KC_DB_PASSWORD: NewPass123!
+      KC_HOSTNAME_STRICT: false
+      KC_HTTP_ENABLED: true
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql_kc
+    command: start-dev
+    networks:
+      - tricol-network
+
+volumes:
+  mysql-data:
+
+networks:
+  tricol-network:
+    driver: bridge
+
