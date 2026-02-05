@@ -32,6 +32,7 @@ public class SecurityConfig {
     private final KeycloakJwtFilter keycloakJwtFilter;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CorsConfig corsConfig;
 
     @Bean
     public PasswordEncoder passwordEncoder() {

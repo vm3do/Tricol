@@ -42,4 +42,3 @@ volumes:
 networks:
   tricol-network:
     driver: bridge
-
